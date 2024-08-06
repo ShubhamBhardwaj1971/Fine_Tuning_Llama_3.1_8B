@@ -30,7 +30,6 @@ def execute_workflows(workflow_names):
             'workflow_name': workflow_name,
         }
         response = requests.post('http://localhost/executor/workflows/api/execute', headers=headers, json=json_data)
-        print(f'Response for {workflow_name}:', response.json()) 
         
 workflow_list = ['Fine Tuning Data - Integrity Checks', 'App Data Validation', 'Batch Inference Performance Debugging'] 
          
@@ -112,19 +111,16 @@ def finetuned_llm():
 
         end_time = time.time()
         elapsed_time = end_time - start_time
-        print("Response generation time:", elapsed_time)
 
         # Ensure outputs are as expected
         if outputs and isinstance(outputs, list) and "generated_text" in outputs[0]:
             generated_text = outputs[0]["generated_text"]
-            print("Generated Text (Raw):", generated_text)
 
             # Extract the first 'assistant' role message
             assistant_response = next(
                 (message["content"] for message in generated_text if message["role"] == "assistant"), 
                 "No answer found."
             )
-            print("Extracted Response:", assistant_response)
             
             # Extract content before the stop word directly
             stop_word = "<|im_end|>"  # Define the stop word
@@ -142,12 +138,8 @@ def finetuned_llm():
             assistant_response = re.sub(r"\s+", " ", assistant_response)  # Normalize whitespace
             assistant_response = assistant_response.strip()  # Trim leading and trailing whitespace
 
-            print("Final Cleaned Response:", assistant_response)
-
             # Compare with expected output
             is_match = assistant_response == expected_output
-            print("Expected Output:", expected_output)
-            print("Match:", is_match)
             
             if not is_match:
              execute_workflows(workflow_list) 
